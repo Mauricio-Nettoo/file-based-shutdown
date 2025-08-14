@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts",
-    "build": "deno compile --icon ./assets/app-icon.ico --output ./bin/DTF-2h.exe --allow-all ./main.ts"
+    "dev": "deno run ./src/main.ts",
+    "build": "deno compile --icon ./assets/app-icon.ico --output ./bin/DTF-2h.exe --allow-all ./src/main.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1"
