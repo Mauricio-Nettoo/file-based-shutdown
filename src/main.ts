@@ -1,4 +1,5 @@
 import { DEFAULT_FOLDERS, FILE_PREFIX } from "./config.ts";
+import { convertTimeStringToNumberSecondsSyncV1 } from "./utils/convert-time-string-to-seconds.ts";
 import { extractTimeFromFileNameV1Sync } from "./utils/extract-time-from-file-name.ts";
 import { findFileInFolders } from "./utils/find-file.ts";
 
@@ -7,13 +8,6 @@ function getHomeDir(): string {
     Deno.env.get("HOME");
   if (!home) throw new Error("User home folder was not found.");
   return home;
-}
-
-function convertStringToTimeInSeconds(textTime: string): number {
-  const hours: number = Number(textTime.match(/(\d+)h/)?.[1] ?? 0);
-  const minutes: number = Number(textTime.match(/(\d+)m/)?.[1] ?? 0);
-  const seconds: number = Number(textTime.match(/(\d+)s/)?.[1] ?? 0);
-  return hours * 3600 + minutes * 60 + seconds;
 }
 
 function sleep(timeMs: number): Promise<number> {
@@ -62,7 +56,7 @@ async function main() {
   }
 
   const time: string = extractTimeFromFileNameV1Sync(filePath);
-  const timeInSeconds: number = convertStringToTimeInSeconds(time);
+  const timeInSeconds: number = convertTimeStringToNumberSecondsSyncV1(time);
   await turnOffPc(timeInSeconds);
 }
 
