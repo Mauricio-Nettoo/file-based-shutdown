@@ -1,8 +1,6 @@
-import * as os from "node:os";
 import * as path from "jsr:@std/path";
 
 import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
-import { text } from "node:stream/consumers";
 
 const env: DotenvConfig = config();
 const FILE_PREFIX = env.FILE_PREFIX || "DTF-";
@@ -99,7 +97,7 @@ async function main() {
     Deno.exit(1);
   }
 
-  const time: string = stripFileNameFromTime(appFileName);
+  const time: string = stripFileNameFromTime(filePath);
   const timeInSeconds: number = convertStringToTimeInSeconds(time);
   await turnOffPc(timeInSeconds);
 }
