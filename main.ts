@@ -60,17 +60,34 @@ function sleep(timeMs: number): Promise<number> {
   });
 }
 
-async function turnOffPc(timeInSeconds: number): Promise<void> {
-  do {
-    console.log(`Turning off PC in: ${timeInSeconds}`);
-    timeInSeconds--;
-    await sleep(1000);
-    console.clear();
-  } while (timeInSeconds > 0);
-  const outpout = await new Deno.Command("cmd", {
-    args: ["/c", "shutdown /s /t 0"],
-  }).output();
-  console.log(outpout);
+async function turnOffPc(
+  timeInSeconds: number,
+  dryRun: boolean = false,
+): Promise<void> {
+  console.log("Press CTRL+C to cancel.");
+
+  const controller: AbortController = new AbortController();
+  const signal: AbortSignal = controller.signal;
+
+  Deno.addSignalListener("SIGINT", () => {
+    console.log("\nShutdown canceled!");
+    controller.abort();
+  });
+
+  for (let i = timeInSeconds; i > 0; i--) {
+    await sleep(1000); // 1 sec
+    await Deno.stdout.write(new TextEncoder().encode(`\rShutdown in: ${i}s`));
+    if (signal.aborted) return;
+  }
+
+  console.log("\nShuting down…");
+  if (!dryRun) {
+    await new Deno.Command("cmd", {
+      args: ["/c", "shutdown", "/s", "/t", "0"],
+    }).output();
+  } else {
+    console.log("(No shutdown: Just testing!)");
+  }
 }
 
 // Teste of something that can or not work out.
@@ -82,7 +99,6 @@ async function main() {
     Deno.exit(1);
   }
 
-  if (!appFileName) throw new Error("file name not found");
   const time: string = stripFileNameFromTime(appFileName);
   const timeInSeconds: number = convertStringToTimeInSeconds(time);
   await turnOffPc(timeInSeconds);
