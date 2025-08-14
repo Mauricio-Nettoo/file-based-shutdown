@@ -2,6 +2,7 @@ import * as os from "node:os";
 import * as path from "jsr:@std/path";
 
 import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
+import { text } from "node:stream/consumers";
 
 const env: DotenvConfig = config();
 const FILE_PREFIX = env.FILE_PREFIX || "DTF-";
@@ -47,36 +48,10 @@ function stripFileNameFromTime(fileName: string): string {
 }
 
 function convertStringToTimeInSeconds(textTime: string): number {
-  let hours: number = 0;
-  let minutes: number = 0;
-  let seconds: number = 0;
-
-  let previousChars: string = "";
-
-  for (const char of textTime) {
-    if (isLetter(char) && char == "h") {
-      hours += Number(previousChars);
-      previousChars = "";
-      continue;
-    }
-
-    if (isLetter(char) && char == "m") {
-      minutes += Number(previousChars);
-      previousChars = "";
-      continue;
-    }
-
-    if (isLetter(char) && char == "s") {
-      seconds += Number(previousChars);
-      break;
-    }
-
-    previousChars += char;
-  }
-
-  const timeInSeconds: number = (hours * 60 * 60) + (minutes * 60) + seconds;
-
-  return timeInSeconds;
+  const hours: number = Number(textTime.match(/(\d+)h/)?.[1] ?? 0);
+  const minutes: number = Number(textTime.match(/(\d+)m/)?.[1] ?? 0);
+  const seconds: number = Number(textTime.match(/(\d+)s/)?.[1] ?? 0);
+  return hours * 3600 + minutes * 60 + seconds;
 }
 
 function isLetter(value: string): boolean {
