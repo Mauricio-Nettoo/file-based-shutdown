@@ -13,7 +13,7 @@ function getHomeDir(): string {
   return home;
 }
 
-async function getAppExecutableName(): Promise<string | null> {
+async function getAppExecutablePath(): Promise<string | null> {
   const placesToLookFor: string[] = [
     "Documents",
     "Downloads",
@@ -22,21 +22,25 @@ async function getAppExecutableName(): Promise<string | null> {
     "Videos",
     "Music",
   ];
-
-  const userHomeFolder: string = os.homedir();
+  const home: string = getHomeDir();
 
   for (const folder of placesToLookFor) {
-    const filePath: string = path.join(userHomeFolder, folder);
-
-    for await (const entry of Deno.readDir(filePath)) {
-      if (!entry.isFile) continue;
-
-      if (entry.name.includes(FILE_PREFIX)) return entry.name;
+    const dir: string = path.join(home, folder);
+    try {
+      for await (const entry of Deno.readDir(dir)) {
+        if (entry.isFile && entry.name.startsWith(FILE_PREFIX)) {
+          return path.join(dir, entry.name);
+        }
+      }
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) continue;
+      if (err instanceof Error) {
+        console.warn(`Ignoring dir ${dir}: ${err.message}`);
+      }
     }
   }
 
-  console.error("File not found ANYWHERE!");
-
+  console.error("File not found in default places.");
   return null;
 }
 
