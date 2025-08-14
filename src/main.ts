@@ -3,9 +3,8 @@ import { convertTimeStringToNumberSecondsSyncV1 } from "./utils/convert-time-str
 import { extractTimeFromFileNameV1Sync } from "./utils/extract-time-from-file-name.ts";
 import { findFileInFolders } from "./utils/find-file.ts";
 import { getUserHomeDirSync } from "./utils/get-user-home-dir.ts";
-import { sleep } from "./utils/sleep.ts";
+import { shutodwn } from "./utils/shutdown.ts";
 
-// Teste of something that can or not work out.
 async function main() {
   const home: string = getUserHomeDirSync();
   const filePath = await findFileInFolders(FILE_PREFIX, home, DEFAULT_FOLDERS);
@@ -16,7 +15,8 @@ async function main() {
 
   const time: string = extractTimeFromFileNameV1Sync(filePath);
   const timeInSeconds: number = convertTimeStringToNumberSecondsSyncV1(time);
-  await turnOffPc(timeInSeconds);
+
+  await shutodwn(timeInSeconds);
 }
 
 if (import.meta.main) {
