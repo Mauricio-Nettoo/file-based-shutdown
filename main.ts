@@ -4,7 +4,7 @@ import * as path from "jsr:@std/path";
 import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
 
 const env: DotenvConfig = config();
-const FILE_BASE_NAME = env.FILE_BASE_NAME || "DTF-";
+const FILE_PREFIX = env.FILE_PREFIX || "DTF-";
 
 function getHomeDir(): string {
   const home: string | undefined = Deno.env.get("USERPROFILE") ??
@@ -31,7 +31,7 @@ async function getAppExecutableName(): Promise<string | null> {
     for await (const entry of Deno.readDir(filePath)) {
       if (!entry.isFile) continue;
 
-      if (entry.name.includes(FILE_BASE_NAME)) return entry.name;
+      if (entry.name.includes(FILE_PREFIX)) return entry.name;
     }
   }
 
@@ -41,7 +41,7 @@ async function getAppExecutableName(): Promise<string | null> {
 }
 
 function stripFileNameFromTime(fileName: string): string {
-  return fileName.split(FILE_BASE_NAME)[1];
+  return fileName.split(FILE_PREFIX)[1];
 }
 
 function convertStringToTimeInSeconds(textTime: string): number {
