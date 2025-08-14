@@ -1,48 +1,15 @@
-import * as path from "jsr:@std/path";
+import { DEFAULT_FOLDERS, FILE_PREFIX } from "./config.ts";
+import { findFileInFolders } from "./utils/find-file.ts";
 
-import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
-
-const env: DotenvConfig = config();
-const FILE_PREFIX = env.FILE_PREFIX || "DTF-";
-const DEFAULT_FOLDERS: string[] = [
-  "Documents",
-  "Downloads",
-  "Desktop",
-  "Pictures",
-  "Videos",
-  "Music",
-];
+function stripFileNameFromTime(fileName: string): string {
+  return fileName.split(FILE_PREFIX)[1].split(".")[0];
+}
 
 function getHomeDir(): string {
   const home: string | undefined = Deno.env.get("USERPROFILE") ??
     Deno.env.get("HOME");
   if (!home) throw new Error("User home folder was not found.");
   return home;
-}
-
-async function findFileInFolders(
-  filePrefix: string,
-  baseDir: string,
-  folders: string[],
-): Promise<string | null> {
-  for (const folder of folders) {
-    const dir: string = path.join(baseDir, folder);
-    try {
-      for await (const entry of Deno.readDir(dir)) {
-        if (entry.isFile && entry.name.startsWith(filePrefix)) {
-          return path.join(dir, entry.name);
-        }
-      }
-    } catch (err) {
-      if (err instanceof Deno.errors.NotFound) continue;
-      throw err;
-    }
-  }
-  return null;
-}
-
-function stripFileNameFromTime(fileName: string): string {
-  return fileName.split(FILE_PREFIX)[1].split(".")[0];
 }
 
 function convertStringToTimeInSeconds(textTime: string): number {
