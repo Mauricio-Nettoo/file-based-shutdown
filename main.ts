@@ -42,7 +42,7 @@ async function findFileInFolders(
 }
 
 function stripFileNameFromTime(fileName: string): string {
-  return fileName.split(FILE_PREFIX)[1];
+  return fileName.split(FILE_PREFIX)[1].split(".")[0];
 }
 
 function convertStringToTimeInSeconds(textTime: string): number {
@@ -68,14 +68,14 @@ async function turnOffPc(
   const signal: AbortSignal = controller.signal;
 
   Deno.addSignalListener("SIGINT", () => {
-    console.log("\nShutdown canceled!");
     controller.abort();
+    console.log("\nShutdown canceled!");
   });
 
   for (let i = timeInSeconds; i > 0; i--) {
-    await sleep(1000); // 1 sec
-    await Deno.stdout.write(new TextEncoder().encode(`\rShutdown in: ${i}s`));
     if (signal.aborted) return;
+    await Deno.stdout.write(new TextEncoder().encode(`\rShutdown in: ${i}s`));
+    await sleep(1000); // 1 sec
   }
 
   console.log("\nShuting down…");
