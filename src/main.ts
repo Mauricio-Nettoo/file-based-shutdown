@@ -2,18 +2,13 @@ import { DEFAULT_FOLDERS, FILE_PREFIX } from "./config.ts";
 import { convertTimeStringToNumberSecondsSyncV1 } from "./utils/convert-time-string-to-seconds.ts";
 import { extractTimeFromFileNameV1Sync } from "./utils/extract-time-from-file-name.ts";
 import { findFileInFolders } from "./utils/find-file.ts";
+import { sleep } from "./utils/sleep.ts";
 
 function getHomeDir(): string {
   const home: string | undefined = Deno.env.get("USERPROFILE") ??
     Deno.env.get("HOME");
   if (!home) throw new Error("User home folder was not found.");
   return home;
-}
-
-function sleep(timeMs: number): Promise<number> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(timeMs), timeMs);
-  });
 }
 
 async function turnOffPc(
