@@ -1,9 +1,6 @@
 import { DEFAULT_FOLDERS, FILE_PREFIX } from "./config.ts";
+import { extractTimeFromFileNameV1Sync } from "./utils/extract-time-from-file-name.ts";
 import { findFileInFolders } from "./utils/find-file.ts";
-
-function stripFileNameFromTime(fileName: string): string {
-  return fileName.split(FILE_PREFIX)[1].split(".")[0];
-}
 
 function getHomeDir(): string {
   const home: string | undefined = Deno.env.get("USERPROFILE") ??
@@ -64,7 +61,7 @@ async function main() {
     Deno.exit(1);
   }
 
-  const time: string = stripFileNameFromTime(filePath);
+  const time: string = extractTimeFromFileNameV1Sync(filePath);
   const timeInSeconds: number = convertStringToTimeInSeconds(time);
   await turnOffPc(timeInSeconds);
 }
