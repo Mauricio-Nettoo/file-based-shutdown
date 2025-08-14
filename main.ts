@@ -6,6 +6,13 @@ import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
 const env: DotenvConfig = config();
 const FILE_BASE_NAME = env.FILE_BASE_NAME || "DTF-";
 
+function getHomeDir(): string {
+  const home: string | undefined = Deno.env.get("USERPROFILE") ??
+    Deno.env.get("HOME");
+  if (!home) throw new Error("User home folder was not found.");
+  return home;
+}
+
 async function getAppExecutableName(): Promise<string | null> {
   const placesToLookFor: string[] = [
     "Documents",
