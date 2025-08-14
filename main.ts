@@ -5,6 +5,14 @@ import { config, DotenvConfig } from "https://deno.land/x/dotenv/mod.ts";
 
 const env: DotenvConfig = config();
 const FILE_PREFIX = env.FILE_PREFIX || "DTF-";
+const DEFAULT_FOLDERS: string[] = [
+  "Documents",
+  "Downloads",
+  "Desktop",
+  "Pictures",
+  "Videos",
+  "Music",
+];
 
 function getHomeDir(): string {
   const home: string | undefined = Deno.env.get("USERPROFILE") ??
@@ -31,37 +39,6 @@ async function findFileInFolders(
       throw err;
     }
   }
-  return null;
-}
-
-async function getAppExecutablePath(): Promise<string | null> {
-  const placesToLookFor: string[] = [
-    "Documents",
-    "Downloads",
-    "Desktop",
-    "Pictures",
-    "Videos",
-    "Music",
-  ];
-  const home: string = getHomeDir();
-
-  for (const folder of placesToLookFor) {
-    const dir: string = path.join(home, folder);
-    try {
-      for await (const entry of Deno.readDir(dir)) {
-        if (entry.isFile && entry.name.startsWith(FILE_PREFIX)) {
-          return path.join(dir, entry.name);
-        }
-      }
-    } catch (err) {
-      if (err instanceof Deno.errors.NotFound) continue;
-      if (err instanceof Error) {
-        console.warn(`Ignoring dir ${dir}: ${err.message}`);
-      }
-    }
-  }
-
-  console.error("File not found in default places.");
   return null;
 }
 
@@ -127,7 +104,13 @@ async function turnOffPc(timeInSeconds: number): Promise<void> {
 
 // Teste of something that can or not work out.
 async function main() {
-  const appFileName: string | null = await getAppExecutableName();
+  const home: string = getHomeDir();
+  const filePath = await findFileInFolders(FILE_PREFIX, home, DEFAULT_FOLDERS);
+  if (!filePath) {
+    console.error("App file not found.");
+    Deno.exit(1);
+  }
+
   if (!appFileName) throw new Error("file name not found");
   const time: string = stripFileNameFromTime(appFileName);
   const timeInSeconds: number = convertStringToTimeInSeconds(time);
