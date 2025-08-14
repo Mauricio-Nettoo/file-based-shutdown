@@ -1,4 +1,4 @@
-import { sleep } from "./sleep.ts";
+import { showTimer } from "./show-timer.ts";
 
 export async function shutodwn(
   timeInSeconds: number,
@@ -12,13 +12,10 @@ export async function shutodwn(
   Deno.addSignalListener("SIGINT", () => {
     controller.abort();
     console.log("\nShutdown canceled!");
+    Deno.exit(1);
   });
 
-  for (let i = timeInSeconds; i > 0; i--) {
-    if (signal.aborted) return;
-    await Deno.stdout.write(new TextEncoder().encode(`\rShutdown in: ${i}s`));
-    await sleep(1000); // 1 sec
-  }
+  await showTimer(timeInSeconds, signal);
 
   console.log("\nShuting down…");
   if (!dryRun) {
