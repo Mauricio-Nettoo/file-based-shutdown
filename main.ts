@@ -54,10 +54,6 @@ function convertStringToTimeInSeconds(textTime: string): number {
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-function isLetter(value: string): boolean {
-  return /^[a-zA-Z]$/.test(value);
-}
-
 function sleep(timeMs: number): Promise<number> {
   return new Promise((resolve) => {
     setTimeout(() => resolve(timeMs), timeMs);
